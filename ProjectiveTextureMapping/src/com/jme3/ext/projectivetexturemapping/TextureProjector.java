@@ -37,7 +37,7 @@ import com.jme3.renderer.queue.GeometryList;
 import com.jme3.texture.Texture2D;
 
 /**
- * A TextureProjector provides the minimum information need by the 
+ * A TextureProjector provides the minimum information needed by the 
  * TextureProjectorRenderer. Could be implemented as a Spatial for example.
  * 
  * @author survivor
