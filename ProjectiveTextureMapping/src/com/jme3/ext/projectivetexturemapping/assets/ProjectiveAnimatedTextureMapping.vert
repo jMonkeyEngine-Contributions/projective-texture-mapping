@@ -20,18 +20,13 @@ uniform int m_SelectedTileV;
 varying vec4 projCoord;
 varying float cosAngle; 
  
-const mat4 biasMat = mat4(0.5, 0.0, 0.0, 0.0,
-                          0.0, 0.5, 0.0, 0.0,
-                          0.0, 0.0, 0.5, 0.0,
-                          0.5, 0.5, 0.5, 1.0);
- 
 void main()
 {
   gl_Position = g_WorldViewProjectionMatrix * vec4(inPosition, 1.0);
   vec4 wsPosition = g_WorldMatrix * vec4(inPosition, 1.0);
   vec3 wsNormal = g_WorldMatrixInverseTranspose * inNormal;
  
-  projCoord = biasMat * m_ProjectorViewProjectionMatrix * wsPosition;
+  projCoord = m_ProjectorViewProjectionMatrix * wsPosition;
   projCoord.x = (((projCoord.x + float(m_SelectedTileU)) / float(m_NumTilesU)));
   projCoord.y = (((projCoord.y + float(m_SelectedTileV)) / float(m_NumTilesV)));
  

@@ -46,7 +46,12 @@ import java.util.HashMap;
  */
 public class SimpleTextureProjector implements TextureProjector
 {
+  private static final Matrix4f biasMatrix = new Matrix4f(0.5f, 0.0f, 0.0f, 0.5f,
+                                                          0.0f, 0.5f, 0.0f, 0.5f,
+                                                          0.0f, 0.0f, 0.5f, 0.5f,
+                                                          0.0f, 0.0f, 0.0f, 1.0f);
   private Camera projectorCamera;
+  private Matrix4f projectorViewProjectionMatrix;
   private Texture2D projectiveTextureMap;
   private GeometryList targetGeometryList;
   private float fallOffDistance;
@@ -61,6 +66,7 @@ public class SimpleTextureProjector implements TextureProjector
  */
   public SimpleTextureProjector(Texture2D projectiveTextureMap)
   {
+    this.projectorViewProjectionMatrix = new Matrix4f();
     this.projectiveTextureMap = projectiveTextureMap;
     this.projectorCamera = new Camera(
       projectiveTextureMap.getImage().getWidth(), 
@@ -108,7 +114,9 @@ public class SimpleTextureProjector implements TextureProjector
   @Override
   public Matrix4f getProjectorViewProjectionMatrix()
   {
-    return this.projectorCamera.getViewProjectionMatrix();
+    this.projectorViewProjectionMatrix.set(biasMatrix);
+    this.projectorViewProjectionMatrix.multLocal(this.projectorCamera.getViewProjectionMatrix());
+    return this.projectorViewProjectionMatrix;
   }
   
   /**

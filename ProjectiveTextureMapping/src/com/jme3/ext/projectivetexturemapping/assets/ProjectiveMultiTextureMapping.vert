@@ -109,11 +109,6 @@ uniform mat3 g_WorldMatrixInverseTranspose;
   varying float cosAngle7;
 #endif
 
-const mat4 biasMat = mat4(0.5, 0.0, 0.0, 0.0,
-                          0.0, 0.5, 0.0, 0.0,
-                          0.0, 0.0, 0.5, 0.0,
-                          0.5, 0.5, 0.5, 1.0);
-
 void main() 
 {
   gl_Position = g_WorldViewProjectionMatrix * vec4(inPosition, 1.0);
@@ -121,7 +116,7 @@ void main()
   vec3 wsNormal = g_WorldMatrixInverseTranspose * inNormal;
 
   #if NUM_PROJECTORS > 0
-    projCoord0 = biasMat * m_ProjectorViewProjectionMatrix0 * wsPosition;
+    projCoord0 = m_ProjectorViewProjectionMatrix0 * wsPosition;
 
     #ifdef IS_PARALLEL_PROJECTION0
       cosAngle0 = dot(wsNormal, -m_ProjectorDirection0);
@@ -131,7 +126,7 @@ void main()
   #endif
 
   #if NUM_PROJECTORS > 1
-    projCoord1 = biasMat * m_ProjectorViewProjectionMatrix1 * wsPosition;
+    projCoord1 = m_ProjectorViewProjectionMatrix1 * wsPosition;
 
     #ifdef IS_PARALLEL_PROJECTION1
       cosAngle1 = dot(wsNormal, -m_ProjectorDirection1);
@@ -141,7 +136,7 @@ void main()
   #endif
 
   #if NUM_PROJECTORS > 2
-    projCoord2 = biasMat * m_ProjectorViewProjectionMatrix2 * wsPosition;
+    projCoord2 = m_ProjectorViewProjectionMatrix2 * wsPosition;
 
     #ifdef IS_PARALLEL_PROJECTION2
       cosAngle2 = dot(wsNormal, -m_ProjectorDirection2);
@@ -151,7 +146,7 @@ void main()
   #endif
 
   #if NUM_PROJECTORS > 3
-    projCoord3 = biasMat * m_ProjectorViewProjectionMatrix3 * wsPosition;
+    projCoord3 = m_ProjectorViewProjectionMatrix3 * wsPosition;
 
     #ifdef IS_PARALLEL_PROJECTION3
       cosAngle3 = dot(wsNormal, -m_ProjectorDirection3);
@@ -161,7 +156,7 @@ void main()
   #endif
 
   #if NUM_PROJECTORS > 4
-    projCoord4 = biasMat * m_ProjectorViewProjectionMatrix4 * wsPosition;
+    projCoord4 = m_ProjectorViewProjectionMatrix4 * wsPosition;
 
     #ifdef IS_PARALLEL_PROJECTION4
       cosAngle4 = dot(wsNormal, -m_ProjectorDirection4);
@@ -171,7 +166,7 @@ void main()
   #endif
 
   #if NUM_PROJECTORS > 5
-    projCoord5 = biasMat * m_ProjectorViewProjectionMatrix5 * wsPosition;
+    projCoord5 = m_ProjectorViewProjectionMatrix5 * wsPosition;
 
     #ifdef IS_PARALLEL_PROJECTION5
       cosAngle5 = dot(wsNormal, -m_ProjectorDirection5);
@@ -181,7 +176,7 @@ void main()
   #endif
 
   #if NUM_PROJECTORS > 6
-    projCoord6 = biasMat * m_ProjectorViewProjectionMatrix6 * wsPosition;
+    projCoord6 = m_ProjectorViewProjectionMatrix6 * wsPosition;
 
     #ifdef IS_PARALLEL_PROJECTION6
       cosAngle6 = dot(wsNormal, -m_ProjectorDirection6);
@@ -191,7 +186,7 @@ void main()
   #endif
 
   #if NUM_PROJECTORS > 7
-    projCoord7 = biasMat * m_ProjectorViewProjectionMatrix7 * wsPosition;
+    projCoord7 = m_ProjectorViewProjectionMatrix7 * wsPosition;
 
     #ifdef IS_PARALLEL_PROJECTION7
       cosAngle7 = dot(wsNormal, -m_ProjectorDirection7);

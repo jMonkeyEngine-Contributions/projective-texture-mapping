@@ -31,18 +31,15 @@
  */
 package jme3test.ext.projectivetexturemapping;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.jme3.app.SimpleApplication;
+import com.jme3.ext.projectivetexturemapping.AnimatedTextureProjectorRenderer;
+import com.jme3.ext.projectivetexturemapping.SimpleTextureProjector;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
-import com.jme3.ext.projectivetexturemapping.AnimatedTextureProjectorRenderer;
-import com.jme3.ext.projectivetexturemapping.SimpleTextureProjector;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.queue.GeometryList;
 import com.jme3.renderer.queue.OpaqueComparator;
@@ -54,39 +51,55 @@ import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture2D;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Test application for Projective Texture Mapping.
+ *
  * @author survivor, H
  */
-public class TestProjectiveAnimatedTextureMapping extends SimpleApplication 
+public class TestProjectiveAnimatedTextureMapping extends SimpleApplication
 {
   private ProjectorData pd2;
   private AnimatedTextureProjectorRenderer aptr;
 
-  public static void main(final String[] args) {
+  public static void main(final String[] args)
+  {
     final TestProjectiveAnimatedTextureMapping app = new TestProjectiveAnimatedTextureMapping();
     app.start();
     Logger.getLogger("").setLevel(Level.SEVERE);
   }
 
   @Override
-  public void simpleInitApp() 
+  public void simpleInitApp()
   {
     setPauseOnLostFocus(false);
-    this.flyCam.setMoveSpeed(3f);
+    flyCam.setMoveSpeed(3f);
+    flyCam.setDragToRotate(true);
 
-    final Material mat = new Material(this.assetManager, "Common/MatDefs/Light/Lighting.j3md");
+    final Material mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
     mat.setColor("Diffuse", ColorRGBA.LightGray);
     mat.setColor("Ambient", ColorRGBA.LightGray);
     mat.setBoolean("UseMaterialColors", true);
 
-    final Box box1 = new Box(Vector3f.ZERO.clone(), 10f, 0.1f, 10f);
-    final Geometry geom1 = new Geometry("Box1", box1);
+    Box box1 = new Box(Vector3f.ZERO.clone(), 2f, 0.1f, 2f);
+    Geometry geom1 = new Geometry("Box1", box1);
     geom1.setMaterial(mat);
-    this.rootNode.attachChild(geom1);
+    rootNode.attachChild(geom1);
 
-    final Material mat2 = new Material(this.assetManager, "Common/MatDefs/Light/Lighting.j3md");
+    Box box3 = new Box(new Vector3f(0, 3, 0), 2f, 0.1f, 2f);
+    Geometry geom3 = new Geometry("Box3", box3);
+    geom3.rotate(0f, 0f, -0.7f);
+    geom3.setMaterial(mat);
+    rootNode.attachChild(geom3);
+    
+    Box box4 = new Box(new Vector3f(0, -3, 0), 2f, 0.1f, 2f);
+    Geometry geom4 = new Geometry("Box4", box4);
+    geom4.setMaterial(mat);
+    rootNode.attachChild(geom4);
+
+    final Material mat2 = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
     mat2.setColor("Diffuse", ColorRGBA.Orange);
     mat.setColor("Ambient", ColorRGBA.LightGray);
     mat2.setBoolean("UseMaterialColors", true);
@@ -94,57 +107,44 @@ public class TestProjectiveAnimatedTextureMapping extends SimpleApplication
     final Sphere sphere1 = new Sphere(32, 32, 0.5f);
     final Geometry geom2 = new Geometry("Sphere1", sphere1);
     geom2.setMaterial(mat2);
-    this.rootNode.attachChild(geom2);
+    rootNode.attachChild(geom2);
 
-    DirectionalLight dl = new DirectionalLight();
-    dl.setDirection(new Vector3f(-0.1f, -0.7f, 1).normalizeLocal());
-    dl.setColor(new ColorRGBA(0.44f, 0.30f, 0.20f, 1.0f));
-    this.rootNode.addLight(dl);
+    final float ar = (float) settings.getWidth() / (float) settings.getHeight();
+    cam.setFrustumPerspective(45, ar, 0.1f, 1000.0f);
+    cam.setLocation(new Vector3f(-1, 3, -1));
+    cam.lookAt(new Vector3f(0, 0, 0), Vector3f.UNIT_Y.clone());
 
-    // skylight
-    dl = new DirectionalLight();
-    dl.setDirection(new Vector3f(-0.6f, -1, -0.6f).normalizeLocal());
-    dl.setColor(new ColorRGBA(0.10f, 0.22f, 0.44f, 1.0f));
-    this.rootNode.addLight(dl);
-
-    // white ambient light
-    dl = new DirectionalLight();
-    dl.setDirection(new Vector3f(1, -0.5f, -0.1f).normalizeLocal());
-    dl.setColor(new ColorRGBA(0.80f, 0.70f, 0.80f, 1.0f));
-    this.rootNode.addLight(dl);
-
-    // real ambient light
-    final AmbientLight al = new AmbientLight();
+    AmbientLight al = new AmbientLight();
     al.setColor(new ColorRGBA(0.1f, 0.1f, 0.1f, 1.0f));
-    this.rootNode.addLight(al);
+    rootNode.addLight(al);
+    
+    DirectionalLight dl = new DirectionalLight();
+    dl.setDirection(cam.getDirection().subtract(cam.getLocation()));
+    dl.setColor(new ColorRGBA(0.8f, 0.8f, 0.8f, 1f));
+    rootNode.addLight(dl);
+            
+    final Texture2D texture2 = (Texture2D) assetManager.loadTexture("Textures/simbolo1 animado.png");
 
-    final float ar = (float) this.settings.getWidth() / (float) this.settings.getHeight();
-    this.cam.setFrustumPerspective(45, ar, 0.1f, 1000.0f);
-    this.cam.setLocation(new Vector3f(-1, 3, -1));
-    this.cam.lookAt(new Vector3f(0, 0, 0), Vector3f.UNIT_Y.clone());
-
-    final Texture2D texture2 = (Texture2D) this.assetManager.loadTexture("Textures/simbolo1 animado.png");
-
-    this.pd2 = new ProjectorData();
-    initProjectorData(this.pd2, new Vector3f(1f, 2.1f, 2f), texture2);
+    pd2 = new ProjectorData();
+    initProjectorData(pd2, new Vector3f(1f, 2.1f, 2f), texture2);
 
     final GeometryList gl = new GeometryList(new OpaqueComparator());
     gl.add(geom1);
-    this.pd2.projector.setTargetGeometryList(gl);
-    this.pd2.projector.getProjectorCamera().setFrustumPerspective(90f, 1f, 1f, 5f);
-    this.pd2.projector.getProjectorCamera().setParallelProjection(true);
+    pd2.projector.setTargetGeometryList(gl);
+    pd2.projector.getProjectorCamera().setFrustumPerspective(90f, 1f, 1f, 5f);
+    pd2.projector.getProjectorCamera().setParallelProjection(true);
 
-    this.aptr = new AnimatedTextureProjectorRenderer(this.assetManager, this.timer, 6, 1, 20);
-    this.aptr.getTextureProjectors().add(this.pd2.projector);
+    aptr = new AnimatedTextureProjectorRenderer(assetManager, timer, 6, 1, 20);
+    aptr.getTextureProjectors().add(pd2.projector);
 
     Logger.getLogger("").severe(
-            "NUM_PROJECTORS: " + this.aptr.getTextureProjectors().size() + ", NUM_PASSES: "
-            + this.aptr.getTextureProjectors().size());
+      "NUM_PROJECTORS: " + aptr.getTextureProjectors().size() + 
+      ", NUM_PASSES: "   + aptr.getTextureProjectors().size());
 
-    this.viewPort.addProcessor(this.aptr);
+    viewPort.addProcessor(aptr);
   }
 
-  private void initProjectorData(final ProjectorData pd, final Vector3f location, final Texture2D texture) 
+  private void initProjectorData(final ProjectorData pd, final Vector3f location, final Texture2D texture)
   {
     texture.setMinFilter(Texture.MinFilter.Trilinear);
     texture.setMagFilter(Texture.MagFilter.Bilinear);
@@ -164,7 +164,8 @@ public class TestProjectiveAnimatedTextureMapping extends SimpleApplication
     projectorCamera.setParallelProjection(false);
 
     pd.frustumPoints = new Vector3f[8];
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++)
+    {
       pd.frustumPoints[i] = new Vector3f();
     }
 
@@ -172,27 +173,27 @@ public class TestProjectiveAnimatedTextureMapping extends SimpleApplication
     final Geometry frustumMdl = new Geometry("f", pd.frustum);
     frustumMdl.setCullHint(Spatial.CullHint.Never);
     frustumMdl.setShadowMode(ShadowMode.Off);
-    frustumMdl.setMaterial(new Material(this.assetManager, "Common/MatDefs/Misc/Unshaded.j3md"));
+    frustumMdl.setMaterial(new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md"));
     frustumMdl.getMaterial().setColor("Color", ColorRGBA.White);
-    this.rootNode.attachChild(frustumMdl);
+    rootNode.attachChild(frustumMdl);
   }
 
   @Override
-  public void simpleUpdate(final float tpf) 
+  public void simpleUpdate(final float tpf)
   {
-    final float s = FastMath.sin(this.timer.getTimeInSeconds() * 0.8f - FastMath.PI)
-            * FastMath.sin(this.timer.getTimeInSeconds() * 0.5f - FastMath.PI);
-    final float t = FastMath.cos(this.timer.getTimeInSeconds() * 0.6f - FastMath.PI)
-            * FastMath.sin(this.timer.getTimeInSeconds() * 0.3f - FastMath.PI);
+    final float s = FastMath.sin(timer.getTimeInSeconds() * 0.8f - FastMath.PI)
+                  * FastMath.sin(timer.getTimeInSeconds() * 0.5f - FastMath.PI);
+    final float t = FastMath.cos(timer.getTimeInSeconds() * 0.6f - FastMath.PI)
+                  * FastMath.sin(timer.getTimeInSeconds() * 0.3f - FastMath.PI);
 
-    this.pd2.projector.getProjectorCamera().lookAtDirection(Vector3f.UNIT_Y.negate(), Vector3f.UNIT_X.clone());
-    this.pd2.projector.getProjectorCamera().setLocation(new Vector3f(t * 2f, 2.1f, s * 2f));
+    pd2.projector.getProjectorCamera().lookAtDirection(Vector3f.UNIT_Y.negate(), Vector3f.UNIT_X.clone());
+    pd2.projector.getProjectorCamera().setLocation(new Vector3f(t * 2f, 2.1f, s * 2f));
 
-    this.pd2.projector.updateFrustumPoints(this.pd2.frustumPoints);
-    this.pd2.frustum.update(this.pd2.frustumPoints);
+    pd2.projector.updateFrustumPoints(pd2.frustumPoints);
+    pd2.frustum.update(pd2.frustumPoints);
   }
 
-  private class ProjectorData 
+  private class ProjectorData
   {
     SimpleTextureProjector projector;
     WireFrustum frustum;

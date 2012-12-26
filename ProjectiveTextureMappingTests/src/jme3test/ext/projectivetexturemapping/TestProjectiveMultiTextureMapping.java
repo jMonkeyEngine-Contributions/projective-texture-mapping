@@ -32,15 +32,15 @@
 package jme3test.ext.projectivetexturemapping;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.ext.projectivetexturemapping.MultiTextureProjectorRenderer;
+import com.jme3.ext.projectivetexturemapping.MultiTextureProjectorRenderer.CombineMode;
+import com.jme3.ext.projectivetexturemapping.SimpleTextureProjector;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
-import com.jme3.ext.projectivetexturemapping.SimpleTextureProjector;
-import com.jme3.ext.projectivetexturemapping.MultiTextureProjectorRenderer;
-import com.jme3.ext.projectivetexturemapping.MultiTextureProjectorRenderer.CombineMode;
 import com.jme3.renderer.Camera;
 import com.jme3.renderer.queue.GeometryList;
 import com.jme3.renderer.queue.OpaqueComparator;
@@ -76,7 +76,7 @@ public class TestProjectiveMultiTextureMapping extends SimpleApplication
   {
     setPauseOnLostFocus(false);
     flyCam.setMoveSpeed(3f);
-    //flyCam.setEnabled(false);
+    flyCam.setDragToRotate(true);
     
     Material mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
     mat.setColor("Diffuse", ColorRGBA.LightGray);
@@ -109,34 +109,20 @@ public class TestProjectiveMultiTextureMapping extends SimpleApplication
     geom2.setMaterial(mat2);
     rootNode.attachChild(geom2);
 
-    // sunset light
-    DirectionalLight dl = new DirectionalLight();
-    dl.setDirection(new Vector3f(-0.1f, -0.7f, 1).normalizeLocal());
-    dl.setColor(new ColorRGBA(0.44f, 0.30f, 0.20f, 1.0f));
-    rootNode.addLight(dl);
-
-    // skylight
-    dl = new DirectionalLight();
-    dl.setDirection(new Vector3f(-0.6f, -1, -0.6f).normalizeLocal());
-    dl.setColor(new ColorRGBA(0.10f, 0.22f, 0.44f, 1.0f));
-    rootNode.addLight(dl);    
-
-    // white ambient light
-    dl = new DirectionalLight();
-    dl.setDirection(new Vector3f(1, -0.5f, -0.1f).normalizeLocal());
-    dl.setColor(new ColorRGBA(0.80f, 0.70f, 0.80f, 1.0f));
-    rootNode.addLight(dl);
-            
-    // real ambient light
-    AmbientLight al = new AmbientLight();
-    al.setColor(new ColorRGBA(0.1f, 0.1f, 0.1f, 1.0f));
-    rootNode.addLight(al);
-    
     float ar = ((float) settings.getWidth()) / ((float) settings.getHeight());
     cam.setFrustumPerspective(45, ar, 0.1f, 1000.0f);
     cam.setLocation(new Vector3f(-1, 3, -1));
     cam.lookAt(new Vector3f(0, 0, 0), Vector3f.UNIT_Y.clone());
     
+    AmbientLight al = new AmbientLight();
+    al.setColor(new ColorRGBA(0.1f, 0.1f, 0.1f, 1.0f));
+    rootNode.addLight(al);
+    
+    DirectionalLight dl = new DirectionalLight();
+    dl.setDirection(cam.getDirection().subtract(cam.getLocation()));
+    dl.setColor(new ColorRGBA(0.8f, 0.8f, 0.8f, 1f));
+    rootNode.addLight(dl);
+            
     Texture2D texture1 = (Texture2D) assetManager.loadTexture("Textures/Monkey4.png");
     Texture2D texture2 = (Texture2D) assetManager.loadTexture("Textures/rune.png");
     
@@ -177,12 +163,13 @@ public class TestProjectiveMultiTextureMapping extends SimpleApplication
 //    ptr2.getTextureProjectors().add(pd2.projector);
 //    ptr2.getTextureProjectors().add(pd2.projector);
     
-    Logger.getLogger("").severe("NUM_PROJECTORS: " + 
-            (ptr1.getTextureProjectors().size() + 
-             ptr2.getTextureProjectors().size()) + 
+    Logger.getLogger("").severe(
+      "NUM_PROJECTORS: " + 
+      (ptr1.getTextureProjectors().size() + 
+       ptr2.getTextureProjectors().size()) + 
       ", NUM_PASSES: " + 
-            (((ptr1.getTextureProjectors().size() + 7) / 8) + 
-             ((ptr2.getTextureProjectors().size() + 7) / 8)));
+      (((ptr1.getTextureProjectors().size() + 7) / 8) + 
+       ((ptr2.getTextureProjectors().size() + 7) / 8)));
     
     viewPort.addProcessor(ptr1);
     viewPort.addProcessor(ptr2);
@@ -226,9 +213,9 @@ public class TestProjectiveMultiTextureMapping extends SimpleApplication
   public void simpleUpdate(float tpf) 
   {
     float s = FastMath.sin(timer.getTimeInSeconds() * 0.8f - FastMath.PI) * 
-      (FastMath.sin( timer.getTimeInSeconds() * 0.5f - FastMath.PI));
+             (FastMath.sin(timer.getTimeInSeconds() * 0.5f - FastMath.PI));
     float t = FastMath.cos(timer.getTimeInSeconds() * 0.6f - FastMath.PI) * 
-      (FastMath.sin( timer.getTimeInSeconds() * 0.3f - FastMath.PI));
+             (FastMath.sin(timer.getTimeInSeconds() * 0.3f - FastMath.PI));
     
     pd1.projector.getProjectorCamera().lookAt(new Vector3f(s * 0.5f, 0f, t * 3f), Vector3f.UNIT_X.clone());    
     pd2.projector.getProjectorCamera().lookAtDirection(Vector3f.UNIT_Y.negate(), Vector3f.UNIT_X.clone());
