@@ -22,5 +22,13 @@
             <exclude name="**/dist/"/>
             <exclude name="**/nbproject/private/"/>
         </zip>
-    </target>    
+    </target>
+    <target name="-clean-subproject" depends="files-init">
+        <delete failonerror="false" includeemptydirs="true">
+            <fileset dir="${build.dir}">
+                <exclude name="testuserdir/"/>
+            </fileset>
+            <fileset dir="${release.dir}" />
+        </delete>
+    </target> 
 </project>

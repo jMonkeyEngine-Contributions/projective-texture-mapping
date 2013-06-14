@@ -73,7 +73,9 @@
                     </run-dependency>
                 </dependency>
             </module-dependencies>
-            <public-packages/>
+            <public-packages>
+                <package>com.jme3.ext.projectivetexturemapping</package>
+            </public-packages>
         </data>
     </configuration>
 </project>
